@@ -1,0 +1,50 @@
+{
+  "apps": [
+    {
+      "id": "snake",
+      "title": "贪吃蛇",
+      "description": "离线街机游戏，支持键盘、触屏、暂停和最高分。",
+      "file": "snake.html",
+      "order": 1,
+      "connectDomains": []
+    },
+    {
+      "id": "minesweeper",
+      "title": "扫雷",
+      "description": "离线解谜游戏，支持三档难度、安全首击和插旗。",
+      "file": "minesweeper.html",
+      "order": 2,
+      "connectDomains": []
+    },
+    {
+      "id": "stocks",
+      "title": "股票行情",
+      "description": "美股、港股、A股和指数，支持名称搜索与走势缩略图。",
+      "file": "stocks.html",
+      "order": 3,
+      "connectDomains": [
+        "https://qt.gtimg.cn",
+        "https://web.ifzq.gtimg.cn",
+        "https://smartbox.gtimg.cn"
+      ]
+    },
+    {
+      "id": "crypto",
+      "title": "加密货币",
+      "description": "Binance 现货 24 小时行情，自动刷新并可暂停。",
+      "file": "crypto.html",
+      "order": 4,
+      "connectDomains": [
+        "https://api.binance.com"
+      ]
+    },
+    {
+      "id": "loader-preview",
+      "title": "旧入口预览",
+      "description": "旧版卡片入口，仅作为静态预览保留。",
+      "file": "loader.html",
+      "order": 99,
+      "connectDomains": []
+    }
+  ]
+}

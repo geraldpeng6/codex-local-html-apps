@@ -1,6 +1,6 @@
 # Codex HTML 应用台插件
 
-一个基于 [MCP Apps](https://developers.openai.com/plugins/build/chatgpt-ui) 的本地 Codex 插件。同一个 MCP server 按需返回多个 HTML UI：预置贪吃蛇、扫雷、股票行情和加密货币行情；新增页面只需要在 `apps/` 放 HTML，并在 `server.py` 注册。
+一个基于 [MCP Apps](https://developers.openai.com/plugins/build/chatgpt-ui) 的通用 HTML 运行时插件。`apps.open` 打开唯一入口，页面顶栏可选择已注册应用；每个应用仍能通过独立工具或深链接直接打开。
 
 ## 应用
 
@@ -27,8 +27,10 @@ MCP 配置使用插件内相对路径 `./server.py`；这是 Codex 插件加载�
 
 ## 添加应用
 
-1. 把独立 HTML 放进 `apps/`。
-2. 在 `server.py` 的 `APPS_INDEX` 加一项，指定 slug、标题、文件名、工具描述、返回文案；访问外部 API 时设置 `connect_domains`。
+1. 把自包含 HTML 放进 `apps/`。
+2. 在 `apps/app.json` 的 `apps` 数组加一项：`id`、`title`、`description`、`file`、`order`；访问外部 API 时设置 `connectDomains`。
 3. 升级 `plugin.json` 的版本号，重新安装插件。
+
+通用运行时通过 `runtime.load` 按需取回 HTML，并放进独立 iframe。这样不需要为每个页面新增 server 代码。
 
 工具通过 `_meta.ui.resourceUri` 关联自己的 `ui://local-html-apps/<file>` 资源，并声明 `global` 和 `thread` 入口。

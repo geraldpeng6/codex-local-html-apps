@@ -9,7 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 APPS = ROOT / "apps"
-VERSION = "1.1.2"
+MANIFEST = APPS / "app.json"
+VERSION = "1.2.0"
 PROTOCOLS = ("2024-11-05", "2025-03-26", "2025-06-18", "2025-11-25", "2026-07-28")
 
 SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none"><path d="M4 15h8a3 3 0 0 0 0-6H7a3 3 0 0 1 0-6h7v3" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="4.5" r=".7" fill="currentColor"/></svg>'
@@ -62,45 +63,24 @@ class App:
         }
 
 
-APPS_INDEX = {
-    "apps": App(
-        "apps",
-        "HTML 应用台",
-        "loader.html",
-        "打开预置应用入口，选择游戏或行情面板。",
-        "HTML 应用台已准备好。可选择贪吃蛇、扫雷、股票行情或加密货币。",
-    ),
-    "snake": App(
-        "snake",
-        "贪吃蛇",
-        "snake.html",
-        "打开可玩的贪吃蛇游戏，支持键盘、触屏和最高分。",
-        "贪吃蛇已准备好。方向键或 WASD 转向，空格暂停，R 重开。",
-    ),
-    "minesweeper": App(
-        "minesweeper",
-        "扫雷",
-        "minesweeper.html",
-        "打开扫雷，支持三档难度、安全首击、插旗和计时。",
-        "扫雷已准备好。左键翻开，右键或长按插旗。",
-    ),
-    "stocks": App(
-        "stocks",
-        "股票行情",
-        "stocks.html",
-        "查看美股、港股、A股和指数行情，支持名称或代码搜索。",
-        "股票行情已准备好。默认读取腾讯公开行情；可添加或移除关注标的。",
-        ("https://qt.gtimg.cn", "https://web.ifzq.gtimg.cn", "https://smartbox.gtimg.cn"),
-    ),
-    "crypto": App(
-        "crypto",
-        "加密货币",
-        "crypto.html",
-        "查看 Binance 现货 24 小时行情，支持自动刷新和暂停。",
-        "加密货币行情已准备好。默认包含 BTC、ETH、SOL、BNB、XRP 和 DOGE。",
-        ("https://api.binance.com",),
-    ),
-}
+def load_manifest():
+    data = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    apps = {}
+    for item in data.get("apps", []):
+        apps[item["id"]] = App(
+            item["id"],
+            item["title"],
+            item["file"],
+            item.get("description", ""),
+            f"{item['title']}已准备好。",
+            item.get("connectDomains", ()),
+        )
+    return apps
+
+
+APPS_INDEX = load_manifest()
+LOADER = App("apps", "HTML 应用台", "loader.html", "通用 HTML 应用运行时。", "HTML 应用台已准备好。")
+LOADER_URI = LOADER.uri
 TOOL_TO_APP = {f"{slug}.open": slug for slug in APPS_INDEX}
 
 
@@ -125,10 +105,63 @@ def dispatch(method, params):
     if method == "ping":
         return {}
     if method == "tools/list":
-        return {"tools": [app.tool for app in APPS_INDEX.values()]}
+        tools = [
+            {
+                "name": "apps.open",
+                "title": "HTML 应用台",
+                "description": "打开通用 HTML 应用运行时，可在顶栏选择预置应用。",
+                "icons": ICONS,
+                "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False},
+                "annotations": {"readOnlyHint": True, "destructiveHint": False, "openWorldHint": True},
+                "_meta": {
+                    "ui": {"resourceUri": LOADER_URI},
+                    "openai/ui": {"entrypoints": [{"type": "global"}, {"type": "thread"}]},
+                },
+            }
+        ]
+        tools.extend(app.tool for app in APPS_INDEX.values() if app.slug != "loader-preview")
+        tools.append(
+            {
+                "name": "runtime.load",
+                "title": "Load HTML App",
+                "description": "Load one registered HTML app into the generic runtime. Used by apps.open.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {"appId": {"type": "string", "description": "Registered app id from apps/app.json"}},
+                    "required": ["appId"],
+                    "additionalProperties": False,
+                },
+                "annotations": {"readOnlyHint": True, "destructiveHint": False, "openWorldHint": True},
+            }
+        )
+        return {"tools": tools}
     if method == "tools/call":
         name = params.get("name")
+        if name == "apps.open":
+            if params.get("arguments") not in (None, {}):
+                raise ValueError("apps.open accepts empty arguments only")
+            return {
+                "content": [{"type": "text", "text": LOADER.result_text}],
+                "structuredContent": {"app": "apps", "title": LOADER.title, "version": VERSION},
+            }
         if name not in TOOL_TO_APP:
+            if name == "runtime.load":
+                arguments = params.get("arguments") or {}
+                if not isinstance(arguments, dict) or set(arguments) - {"appId"}:
+                    raise ValueError("runtime.load accepts appId only")
+                app_id = arguments.get("appId")
+                if app_id not in APPS_INDEX or app_id == "loader-preview":
+                    raise LookupError("Unknown app")
+                app = APPS_INDEX[app_id]
+                return {
+                    "content": [{"type": "text", "text": f"已返回 {app.title} HTML。"}],
+                    "structuredContent": {
+                        "appId": app.slug,
+                        "title": app.title,
+                        "html": (APPS / app.filename).read_text(encoding="utf-8"),
+                        "connectDomains": app.connect_domains,
+                    },
+                }
             raise LookupError("Unknown tool")
         if params.get("arguments") not in (None, {}):
             raise ValueError(f"{name}.open accepts empty arguments only")
@@ -143,15 +176,34 @@ def dispatch(method, params):
             },
         }
     if method == "resources/list":
-        return {"resources": [app.resource for app in APPS_INDEX.values()]}
+        resources = [LOADER.resource]
+        resources.extend(app.resource for app in APPS_INDEX.values() if app.slug != "loader-preview")
+        return {"resources": resources}
     if method == "resources/templates/list":
         return {"resourceTemplates": []}
     if method == "resources/read":
         uri = params.get("uri")
-        matches = [app for app in APPS_INDEX.values() if app.uri == uri]
+        if uri == LOADER_URI:
+            return {"contents": [LOADER.read()]}
+        matches = [app for app in APPS_INDEX.values() if app.uri == uri and app.slug != "loader-preview"]
         if not matches:
             raise LookupError("Unknown resource")
         return {"contents": [matches[0].read()]}
+    if method == "runtime/load":
+        app_id = params.get("appId")
+        if app_id not in APPS_INDEX or app_id == "loader-preview":
+            raise LookupError("Unknown app")
+        app = APPS_INDEX[app_id]
+        return {
+            "content": [{"type": "text", "text": f"已返回 {app.title} HTML。"}],
+            "structuredContent": {
+                "appId": app.slug,
+                "title": app.title,
+                "html": (APPS / app.filename).read_text(encoding="utf-8"),
+                "connectDomains": app.connect_domains,
+                "resourceUri": app.uri,
+            },
+        }
     raise NotImplementedError("Unknown method")
 
 
