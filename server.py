@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 APPS = ROOT / "apps"
 MANIFEST = APPS / "app.json"
-VERSION = "1.3.1"
+VERSION = "1.3.2"
 PROTOCOLS = ("2024-11-05", "2025-03-26", "2025-06-18", "2025-11-25", "2026-07-28")
 
 SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none"><path d="M4 15h8a3 3 0 0 0 0-6H7a3 3 0 0 1 0-6h7v3" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="4.5" r=".7" fill="currentColor"/></svg>'
@@ -47,7 +47,7 @@ class App:
             marker = "const PRESET_APPS=[];"
             if marker not in text:
                 raise ValueError("Loader HTML is missing PRESET_APPS marker")
-            text = text.replace(marker, "const PRESET_APPS=" + json.dumps(preset, ensure_ascii=True, separators=(",", ":")) + ";", 1)
+            text = text.replace(marker, "const PRESET_APPS=" + json.dumps(preset, ensure_ascii=True, separators=(",", ":")).replace("</", "<\\/") + ";", 1)
         return {
             "uri": self.uri,
             "mimeType": self.mime,
