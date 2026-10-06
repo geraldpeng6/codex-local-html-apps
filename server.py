@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 APPS = ROOT / "apps"
 MANIFEST = APPS / "app.json"
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 PROTOCOLS = ("2024-11-05", "2025-03-26", "2025-06-18", "2025-11-25", "2026-07-28")
 
 SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none"><path d="M4 15h8a3 3 0 0 0 0-6H7a3 3 0 0 1 0-6h7v3" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="4.5" r=".7" fill="currentColor"/></svg>'
@@ -29,30 +29,6 @@ class App:
         self.mime = "text/html;profile=mcp-app"
         self.connect_domains = list(connect_domains)
 
-    @property
-    def resource(self):
-        return {
-            "uri": self.uri,
-            "name": f"{self.slug}-ui",
-            "title": self.title,
-            "mimeType": self.mime,
-        }
-
-    @property
-    def tool(self):
-        return {
-            "name": f"{self.slug}.open",
-            "title": self.title,
-            "description": self.description,
-            "icons": ICONS,
-            "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False},
-            "annotations": {"readOnlyHint": True, "destructiveHint": False, "openWorldHint": bool(self.connect_domains)},
-            "_meta": {
-                "ui": {"resourceUri": self.uri},
-                "openai/ui": {"entrypoints": [{"type": "global"}, {"type": "thread"}]},
-            },
-        }
-
     def read(self):
         csp = {"connectDomains": self.connect_domains, "resourceDomains": []}
         return {
@@ -60,6 +36,15 @@ class App:
             "mimeType": self.mime,
             "text": (APPS / self.filename).read_text(encoding="utf-8"),
             "_meta": {"ui": {"prefersBorder": False, "csp": csp}},
+        }
+
+    @property
+    def resource(self):
+        return {
+            "uri": self.uri,
+            "name": "app-loader-ui",
+            "title": self.title,
+            "mimeType": self.mime,
         }
 
 
@@ -80,8 +65,7 @@ def load_manifest():
 
 APPS_INDEX = load_manifest()
 LOADER = App("apps", "HTML 应用台", "loader.html", "通用 HTML 应用运行时。", "HTML 应用台已准备好。")
-LOADER_URI = LOADER.uri
-TOOL_TO_APP = {f"{slug}.open": slug for slug in APPS_INDEX}
+LOADER_URI = "ui://local-html-apps/loader.html"
 
 
 class InvalidRequest(ValueError):
@@ -119,7 +103,6 @@ def dispatch(method, params):
                 },
             }
         ]
-        tools.extend(app.tool for app in APPS_INDEX.values() if app.slug != "loader-preview")
         tools.append(
             {
                 "name": "runtime.load",
@@ -144,51 +127,49 @@ def dispatch(method, params):
                 "content": [{"type": "text", "text": LOADER.result_text}],
                 "structuredContent": {"app": "apps", "title": LOADER.title, "version": VERSION},
             }
-        if name not in TOOL_TO_APP:
-            if name == "runtime.load":
-                arguments = params.get("arguments") or {}
-                if not isinstance(arguments, dict) or set(arguments) - {"appId"}:
-                    raise ValueError("runtime.load accepts appId only")
-                app_id = arguments.get("appId")
-                if app_id not in APPS_INDEX or app_id == "loader-preview":
-                    raise LookupError("Unknown app")
-                app = APPS_INDEX[app_id]
-                return {
-                    "content": [{"type": "text", "text": f"已返回 {app.title} HTML。"}],
-                    "structuredContent": {
-                        "appId": app.slug,
+        if name == "runtime.load":
+            arguments = params.get("arguments") or {}
+            if not isinstance(arguments, dict) or set(arguments) - {"appId"}:
+                raise ValueError("runtime.load accepts appId only")
+            app_id = arguments.get("appId")
+            if app_id == "__manifest__":
+                apps = [
+                    {
+                        "id": app.slug,
                         "title": app.title,
-                        "html": (APPS / app.filename).read_text(encoding="utf-8"),
+                        "description": app.description,
+                        "file": app.filename,
                         "connectDomains": app.connect_domains,
-                    },
+                    }
+                    for app in APPS_INDEX.values()
+                    if app.slug != "loader-preview"
+                ]
+                return {
+                    "content": [{"type": "text", "text": f"已返回 {len(apps)} 个应用。"}],
+                    "structuredContent": {"apps": apps, "version": VERSION},
                 }
-            raise LookupError("Unknown tool")
-        if params.get("arguments") not in (None, {}):
-            raise ValueError(f"{name}.open accepts empty arguments only")
-        app = APPS_INDEX[TOOL_TO_APP[name]]
-        return {
-            "content": [{"type": "text", "text": app.result_text}],
-            "structuredContent": {
-                "app": app.slug,
-                "title": app.title,
-                "resourceUri": app.uri,
-                "version": VERSION,
-            },
-        }
+            if app_id not in APPS_INDEX or app_id == "loader-preview":
+                raise LookupError("Unknown app")
+            app = APPS_INDEX[app_id]
+            return {
+                "content": [{"type": "text", "text": f"已返回 {app.title} HTML。"}],
+                "structuredContent": {
+                    "appId": app.slug,
+                    "title": app.title,
+                    "html": (APPS / app.filename).read_text(encoding="utf-8"),
+                    "connectDomains": app.connect_domains,
+                },
+            }
+        raise LookupError("Unknown tool")
     if method == "resources/list":
-        resources = [LOADER.resource]
-        resources.extend(app.resource for app in APPS_INDEX.values() if app.slug != "loader-preview")
-        return {"resources": resources}
+        return {"resources": [LOADER.resource]}
     if method == "resources/templates/list":
         return {"resourceTemplates": []}
     if method == "resources/read":
         uri = params.get("uri")
         if uri == LOADER_URI:
             return {"contents": [LOADER.read()]}
-        matches = [app for app in APPS_INDEX.values() if app.uri == uri and app.slug != "loader-preview"]
-        if not matches:
-            raise LookupError("Unknown resource")
-        return {"contents": [matches[0].read()]}
+        raise LookupError("Unknown resource")
     if method == "runtime/load":
         app_id = params.get("appId")
         if app_id not in APPS_INDEX or app_id == "loader-preview":
@@ -201,7 +182,6 @@ def dispatch(method, params):
                 "title": app.title,
                 "html": (APPS / app.filename).read_text(encoding="utf-8"),
                 "connectDomains": app.connect_domains,
-                "resourceUri": app.uri,
             },
         }
     raise NotImplementedError("Unknown method")

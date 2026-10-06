@@ -1,6 +1,6 @@
 # Codex HTML 应用台插件
 
-一个基于 [MCP Apps](https://developers.openai.com/plugins/build/chatgpt-ui) 的通用 HTML 运行时插件。`apps.open` 打开唯一入口，页面顶栏可选择已注册应用；每个应用仍能通过独立工具或深链接直接打开。
+一个基于 [MCP Apps](https://developers.openai.com/plugins/build/chatgpt-ui) 的通用 HTML 运行时插件。`apps.open` 是唯一用户入口，页面顶栏可选择已注册应用；`runtime.load` 是内部加载协议。
 
 ## 应用
 
@@ -33,4 +33,4 @@ MCP 配置使用插件内相对路径 `./server.py`；这是 Codex 插件加载�
 
 通用运行时通过 `runtime.load` 按需取回 HTML，并放进独立 iframe。这样不需要为每个页面新增 server 代码。
 
-工具通过 `_meta.ui.resourceUri` 关联自己的 `ui://local-html-apps/<file>` 资源，并声明 `global` 和 `thread` 入口。
+MCP 只暴露 `apps.open`（带 `global` 和 `thread` 入口）和 `runtime.load`（内部加载）。没有每个 HTML 的独立工具、UI 资源或深链接。
