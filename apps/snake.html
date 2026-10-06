@@ -132,7 +132,7 @@
       if(message.id!=null&&!message.method){const item=pending.get(message.id);if(!item)return;clearTimeout(item.timeout);pending.delete(message.id);message.error?item.reject(message.error):item.resolve(message.result);}
       else if(message.method==="ui/resource-teardown"){clearInterval(timer);window.parent.postMessage({jsonrpc:"2.0",id:message.id,result:{}},"*");}
     });
-    request("ui/initialize",{appInfo:{name:"local-html-apps",version:"1.1.0"},appCapabilities:{},protocolVersion:"2026-01-26"}).then(()=>{
+    request("ui/initialize",{appInfo:{name:"local-html-apps",version:"1.1.2"},appCapabilities:{},protocolVersion:"2026-01-26"}).then(()=>{
       notify("ui/notifications/initialized",{});
       const reportSize=()=>notify("ui/notifications/size-changed",{height:Math.ceil(document.querySelector(".app").getBoundingClientRect().height)+48});
       reportSize();new ResizeObserver(reportSize).observe(document.querySelector(".app"));

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "local-html-apps",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A small MCP App loader for local HTML apps: games and live market dashboards.",
   "license": "MIT",
   "extensions": {

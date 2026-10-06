@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 APPS = ROOT / "apps"
-VERSION = "1.1.1"
+VERSION = "1.1.2"
 PROTOCOLS = ("2024-11-05", "2025-03-26", "2025-06-18", "2025-11-25", "2026-07-28")
 
 SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none"><path d="M4 15h8a3 3 0 0 0 0-6H7a3 3 0 0 1 0-6h7v3" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="4.5" r=".7" fill="currentColor"/></svg>'
@@ -88,9 +88,9 @@ APPS_INDEX = {
         "stocks",
         "股票行情",
         "stocks.html",
-        "查看 Yahoo Finance 公开接口提供的股票行情，可自定义关注代码。",
-        "股票行情已准备好。可添加或移除关注代码；若浏览器跨域限制导致失败，页面会显示原因。",
-        ("https://query1.finance.yahoo.com",),
+        "查看美股、港股、A股和指数行情，支持名称或代码搜索。",
+        "股票行情已准备好。默认读取腾讯公开行情；可添加或移除关注标的。",
+        ("https://qt.gtimg.cn", "https://web.ifzq.gtimg.cn", "https://smartbox.gtimg.cn"),
     ),
     "crypto": App(
         "crypto",
