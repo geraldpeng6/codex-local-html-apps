@@ -1,0 +1,20 @@
+{
+  "name": "local-html-apps",
+  "interface": {
+    "displayName": "HTML 应用台"
+  },
+  "plugins": [
+    {
+      "name": "local-html-apps",
+      "source": {
+        "source": "local",
+        "path": "."
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

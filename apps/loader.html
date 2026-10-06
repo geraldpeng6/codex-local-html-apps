@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HTML 应用台</title>
+<style>
+:root{color-scheme:dark;--bg:#080c16;--card:#111a2d;--line:#283b5e;--ink:#edf6ff;--muted:#93a7c2;--lime:#c5ff75;--coral:#ff7a7a;--cyan:#77e7ff;--amber:#ffcf63}
+*{box-sizing:border-box}body{min-height:100vh;margin:0;padding:clamp(22px,5vw,54px);color:var(--ink);background:radial-gradient(900px 430px at 12% -10%,#28466e33,transparent),radial-gradient(730px 390px at 90% 8%,#254b4040,transparent),linear-gradient(155deg,var(--bg),#02050d);font-family:"Avenir Next","PingFang SC","Noto Sans SC",sans-serif}
+.shell{width:min(1020px,100%);margin:auto}.kicker{display:flex;align-items:center;gap:11px;color:var(--lime);font:800 11px/1 "Courier New",monospace;letter-spacing:.34em}.kicker:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}h1{margin:17px 0 6px;font-size:clamp(34px,7vw,58px);line-height:.98;letter-spacing:-.035em}.lead{max-width:590px;margin:0 0 33px;color:var(--muted);font-size:15px;line-height:1.7}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.card{position:relative;overflow:hidden;min-height:210px;display:flex;flex-direction:column;justify-content:space-between;padding:25px;color:#fff;text-decoration:none;border:1px solid #ffffff22;border-radius:24px;background:linear-gradient(140deg,#20344e,#0d1424);box-shadow:0 24px 65px #00000056;transform:translateY(0) rotate(0);transition:transform .25s ease,box-shadow .25s ease,border-color .25s}.card::after{content:"";position:absolute;inset:0;background:radial-gradient(240px 115px at 88% 0%,#ffffff1f,transparent)}.card:hover{transform:translateY(-7px) rotate(-.55deg);border-color:#ffffff4d;box-shadow:0 33px 84px #00000075}.card:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}.app-name{font-size:28px;font-weight:800;letter-spacing:-.02em}.desc{color:#ffffffb6;font-size:13px;line-height:1.55;max-width:315px}.glyph{align-self:flex-end;width:61px;height:61px;display:grid;place-items:center;font:800 27px/1 "Courier New",monospace;color:#02050d;border-radius:19px;transform:rotate(-8deg);box-shadow:0 12px 28px #0006}.snake{background:linear-gradient(150deg,#7cff8c,#3ff0a4)}.mine{background:linear-gradient(150deg,#ffb35c,#ff5d70)}.stock{background:linear-gradient(150deg,#89f2ff,#5f8bff)}.crypto{background:linear-gradient(150deg,#ffe678,#ff9f43)}small{display:block;margin-top:9px;color:#ffffff70;font:700 10px "Courier New",monospace;letter-spacing:.28em}@media(max-width:640px){.grid{grid-template-columns:1fr}.card{min-height:175px;padding:21px}.lead{margin-bottom:25px}}
+</style>
+</head>
+<body><main class="shell"><p class="kicker">HTML APP LOADER</p><h1>把不同网页<br>装进同一个插件</h1><p class="lead">预置应用由 MCP 按需返回。游戏离线可玩；行情页会读取公开接口，并明确显示数据来源和刷新时间。</p><nav class="grid" aria-label="预置应用">
+<a class="card" href="snake.html"><span><span class="app-name">贪吃蛇</span><small>ARCADE · OFFLINE</small></span><span class="desc">键盘、触屏和方向键都能操作，最高分保存在浏览器里。</span><span class="glyph" style="color:#012d1d">⌁</span></a>
+<a class="card" href="minesweeper.html"><span><span class="app-name">扫雷</span><small>PUZZLE · OFFLINE</small></span><span class="desc">首次点击保证安全，支持插旗、计时和三档难度。</span><span class="glyph" style="color:#4b1a06">◆</span></a>
+<a class="card" href="stocks.html"><span><span class="app-name">股票行情</span><small>MARKET · LIVE</small></span><span class="desc">读取 Yahoo Finance 公开接口，失败时保留上次数据并显示原因。</span><span class="glyph" style="color:#08203d">▲</span></a>
+<a class="card" href="crypto.html"><span><span class="app-name">加密货币</span><small>CRYPTO · LIVE</small></span><span class="desc">读取 Binance 公开行情，可暂停刷新并查看 24 小时涨跌。</span><span class="glyph" style="color:#3f2500">₿</span></a>
+</nav></main></body>
+</html>

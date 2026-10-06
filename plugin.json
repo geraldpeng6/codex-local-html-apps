@@ -1,0 +1,16 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "local-html-apps",
+  "version": "1.1.1",
+  "description": "A small MCP App loader for local HTML apps: games and live market dashboards.",
+  "license": "MIT",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "HTML 应用台",
+        "shortDescription": "在 Codex 里打开贪吃蛇、扫雷和实时行情",
+        "longDescription": "预置多个独立 HTML 应用：贪吃蛇和扫雷可离线游玩，股票和加密货币面板读取公开行情接口。"
+      }
+    }
+  }
+}
