@@ -121,23 +121,6 @@
   document.addEventListener("visibilitychange",()=>{if(document.hidden&&state==="running")togglePause();});
   resetGame(false);
 
-  // Official MCP Apps postMessage bridge, also usable as a standalone preview.
-  if(window.parent!==window) {
-    let rpcId=0;const pending=new Map();
-    const notify=(method,params)=>window.parent.postMessage({jsonrpc:"2.0",method,params},"*");
-    const request=(method,params)=>new Promise((resolve,reject)=>{const id=++rpcId;const timeout=setTimeout(()=>{pending.delete(id);reject(new Error("Host initialization timed out"));},10000);pending.set(id,{resolve,reject,timeout});window.parent.postMessage({jsonrpc:"2.0",id,method,params},"*");});
-    window.addEventListener("message",event=>{
-      if(event.source!==window.parent||event.data?.jsonrpc!=="2.0")return;
-      const message=event.data;
-      if(message.id!=null&&!message.method){const item=pending.get(message.id);if(!item)return;clearTimeout(item.timeout);pending.delete(message.id);message.error?item.reject(message.error):item.resolve(message.result);}
-      else if(message.method==="ui/resource-teardown"){clearInterval(timer);window.parent.postMessage({jsonrpc:"2.0",id:message.id,result:{}},"*");}
-    });
-    request("ui/initialize",{appInfo:{name:"local-html-apps",version:"1.1.2"},appCapabilities:{},protocolVersion:"2026-01-26"}).then(()=>{
-      notify("ui/notifications/initialized",{});
-      const reportSize=()=>notify("ui/notifications/size-changed",{height:Math.ceil(document.querySelector(".app").getBoundingClientRect().height)+48});
-      reportSize();new ResizeObserver(reportSize).observe(document.querySelector(".app"));
-    }).catch(error=>console.warn("MCP App host bridge unavailable:",error.message||error));
-  }
 </script>
 </body>
 </html>

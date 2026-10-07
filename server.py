@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 APPS = ROOT / "apps"
 MANIFEST = APPS / "app.json"
-VERSION = "1.3.2"
+VERSION = "1.4.0"
 PROTOCOLS = ("2024-11-05", "2025-03-26", "2025-06-18", "2025-11-25", "2026-07-28")
 
 SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none"><path d="M4 15h8a3 3 0 0 0 0-6H7a3 3 0 0 1 0-6h7v3" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="4.5" r=".7" fill="currentColor"/></svg>'
@@ -25,7 +25,7 @@ class App:
         self.filename = filename
         self.description = description
         self.result_text = result_text
-        self.uri = f"ui://local-html-apps/{filename}"
+        self.uri = f"ui://local-html-apps/v{VERSION}/{filename}"
         self.mime = "text/html;profile=mcp-app"
         self.connect_domains = list(connect_domains)
 
@@ -42,12 +42,15 @@ class App:
                     "connectDomains": app.connect_domains,
                 }
                 for app in APPS_INDEX.values()
-                if app.slug != "loader-preview"
             ]
-            marker = "const PRESET_APPS=[];"
+            csp["connectDomains"] = sorted({domain for app in APPS_INDEX.values() for domain in app.connect_domains})
+            marker = '<script id="app-data" type="application/json">{}</script>'
             if marker not in text:
-                raise ValueError("Loader HTML is missing PRESET_APPS marker")
-            text = text.replace(marker, "const PRESET_APPS=" + json.dumps(preset, ensure_ascii=True, separators=(",", ":")).replace("</", "<\\/") + ";", 1)
+                raise ValueError("Loader HTML is missing app-data marker")
+            # Escape every '<' so HTML script comments and tags cannot end or
+            # change the parser state of the enclosing JSON data block.
+            payload = json.dumps({"version": VERSION, "apps": preset}, ensure_ascii=True, separators=(",", ":")).replace("<", "\\u003c")
+            text = text.replace(marker, f'<script id="app-data" type="application/json">{payload}</script>', 1)
         return {
             "uri": self.uri,
             "mimeType": self.mime,
@@ -68,7 +71,12 @@ class App:
 def load_manifest():
     data = json.loads(MANIFEST.read_text(encoding="utf-8"))
     apps = {}
-    for item in data.get("apps", []):
+    for item in sorted(data.get("apps", []), key=lambda item: item.get("order", 0)):
+        if item["id"] in apps or item["id"] in ("__manifest__", "__imported__"):
+            raise ValueError("Duplicate or reserved app id")
+        path = (APPS / item["file"]).resolve()
+        if not path.is_relative_to(APPS.resolve()) or path.suffix.lower() not in (".html", ".htm") or not path.is_file():
+            raise ValueError("App file must be an existing HTML file inside apps/")
         apps[item["id"]] = App(
             item["id"],
             item["title"],
@@ -82,7 +90,7 @@ def load_manifest():
 
 APPS_INDEX = load_manifest()
 LOADER = App("apps", "HTML 应用台", "loader.html", "通用 HTML 应用运行时。", "HTML 应用台已准备好。")
-LOADER_URI = "ui://local-html-apps/loader.html"
+LOADER_URI = LOADER.uri
 
 
 class InvalidRequest(ValueError):
@@ -159,13 +167,12 @@ def dispatch(method, params):
                         "connectDomains": app.connect_domains,
                     }
                     for app in APPS_INDEX.values()
-                    if app.slug != "loader-preview"
                 ]
                 return {
                     "content": [{"type": "text", "text": f"已返回 {len(apps)} 个应用。"}],
                     "structuredContent": {"apps": apps, "version": VERSION},
                 }
-            if app_id not in APPS_INDEX or app_id == "loader-preview":
+            if not isinstance(app_id, str) or app_id not in APPS_INDEX:
                 raise LookupError("Unknown app")
             app = APPS_INDEX[app_id]
             return {
@@ -187,20 +194,6 @@ def dispatch(method, params):
         if uri == LOADER_URI:
             return {"contents": [LOADER.read()]}
         raise LookupError("Unknown resource")
-    if method == "runtime/load":
-        app_id = params.get("appId")
-        if app_id not in APPS_INDEX or app_id == "loader-preview":
-            raise LookupError("Unknown app")
-        app = APPS_INDEX[app_id]
-        return {
-            "content": [{"type": "text", "text": f"已返回 {app.title} HTML。"}],
-            "structuredContent": {
-                "appId": app.slug,
-                "title": app.title,
-                "html": (APPS / app.filename).read_text(encoding="utf-8"),
-                "connectDomains": app.connect_domains,
-            },
-        }
     raise NotImplementedError("Unknown method")
 
 

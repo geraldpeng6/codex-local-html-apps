@@ -5,24 +5,155 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HTML 应用台</title>
 <style>
-:root{color-scheme:dark;--bg:#080c16;--card:#111a2d;--line:#283b5e;--ink:#edf6ff;--muted:#93a7c2;--lime:#c5ff75;--coral:#ff7a7a;--cyan:#77e7ff;--amber:#ffcf63}
-*{box-sizing:border-box}body{min-height:100vh;margin:0;padding:clamp(22px,5vw,54px);color:var(--ink);background:radial-gradient(900px 430px at 12% -10%,#28466e33,transparent),radial-gradient(730px 390px at 90% 8%,#254b4040,transparent),linear-gradient(155deg,var(--bg),#02050d);font-family:"Avenir Next","PingFang SC","Noto Sans SC",sans-serif}
-.shell{width:min(1020px,100%);margin:auto}.kicker{display:flex;align-items:center;gap:11px;color:var(--lime);font:800 11px/1 "Courier New",monospace;letter-spacing:.34em}.kicker:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}h1{margin:17px 0 6px;font-size:clamp(34px,7vw,58px);line-height:.98;letter-spacing:-.035em}.lead{max-width:590px;margin:0 0 33px;color:var(--muted);font-size:15px;line-height:1.7}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.card{appearance:none;text-align:left;font:inherit;position:relative;overflow:hidden;min-height:210px;display:flex;flex-direction:column;justify-content:space-between;padding:25px;color:#fff;text-decoration:none;border:1px solid #ffffff22;border-radius:24px;background:linear-gradient(140deg,#20344e,#0d1424);box-shadow:0 24px 65px #00000056;transform:translateY(0) rotate(0);transition:transform .25s ease,box-shadow .25s ease,border-color .25s}.card::after{content:"";position:absolute;inset:0;background:radial-gradient(240px 115px at 88% 0%,#ffffff1f,transparent)}.card:hover{transform:translateY(-7px) rotate(-.55deg);border-color:#ffffff4d;box-shadow:0 33px 84px #00000075}.card:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}.app-name{font-size:28px;font-weight:800;letter-spacing:-.02em}.desc{color:#ffffffb6;font-size:13px;line-height:1.55;max-width:315px}.glyph{align-self:flex-end;width:61px;height:61px;display:grid;place-items:center;font:800 27px/1 "Courier New",monospace;color:#02050d;border-radius:19px;transform:rotate(-8deg);box-shadow:0 12px 28px #0006}.snake{background:linear-gradient(150deg,#7cff8c,#3ff0a4)}.mine{background:linear-gradient(150deg,#ffb35c,#ff5d70)}.stock{background:linear-gradient(150deg,#89f2ff,#5f8bff)}.crypto{background:linear-gradient(150deg,#ffe678,#ff9f43)}small{display:block;margin-top:9px;color:#ffffff70;font:700 10px "Courier New",monospace;letter-spacing:.28em}@media(max-width:640px){.grid{grid-template-columns:1fr}.card{min-height:175px;padding:21px}.lead{margin-bottom:25px}}
-header.hostbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-22px -22px 22px;padding:13px clamp(18px,4vw,30px);background:#0b1120ee;border-bottom:1px solid #283b5e;backdrop-filter:blur(14px)}header.hostbar strong{font-size:15px}header.hostbar .selector{position:relative}header.hostbar button{cursor:pointer;min-width:130px;color:var(--ink);background:#172339;border:1px solid var(--line);border-radius:11px;padding:9px 13px;font:inherit;font-size:13px;text-align:left}header.hostbar button:hover{border-color:var(--cyan)}header.hostbar ul{position:absolute;right:0;top:calc(100% + 7px);width:min(330px,82vw);max-height:min(58vh,430px);overflow:auto;margin:0;padding:6px;list-style:none;background:#0e1727;border:1px solid var(--line);border-radius:15px;box-shadow:0 22px 60px #0009}header.hostbar li{padding:10px;border-radius:10px;cursor:pointer}header.hostbar li:hover,header.hostbar li.active{background:#1b2c49}header.hostbar b{display:block;font-size:13px}header.hostbar small{display:block;margin-top:3px;color:var(--muted);font-size:11px;line-height:1.35}</style>
+:root{color-scheme:dark;--bg:#080c16;--line:#283b5e;--ink:#edf6ff;--muted:#93a7c2;--lime:#c5ff75;--cyan:#77e7ff}
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;color:var(--ink);background:radial-gradient(900px 430px at 12% -10%,#28466e33,transparent),linear-gradient(155deg,var(--bg),#02050d);font-family:"Avenir Next","PingFang SC",sans-serif;min-height:540px}button,select{font:inherit;cursor:pointer;color:var(--ink);background:#172339;border:1px solid var(--line);border-radius:10px;padding:9px 12px}button:hover,select:hover{border-color:var(--cyan)}button:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}.hostbar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:15px 22px;background:#0b1120f5;border-bottom:1px solid var(--line)}.brand{margin-right:auto;font-weight:800;background:none;border:none;padding:0}.version{color:var(--muted);font:11px "Courier New",monospace}.hostbar select{max-width:42vw;min-width:130px;font-size:13px}.hostbar button:not(.brand){font-size:13px}.shell{width:min(1020px,100%);margin:auto;padding:clamp(22px,5vw,48px)}.kicker{color:var(--lime);font:800 11px "Courier New",monospace;letter-spacing:.3em}h1{margin:16px 0;font-size:clamp(34px,6vw,56px);line-height:1.1;letter-spacing:-.04em}.lead{max-width:620px;color:var(--muted);font-size:15px;line-height:1.8;margin-bottom:30px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:12px;min-height:180px;padding:24px;border-radius:20px;background:linear-gradient(140deg,#20344e,#0d1424);transition:transform .2s,border-color .2s}.card:hover{transform:translateY(-4px)}.card b{font-size:26px}.card span{font-size:13px;line-height:1.7;color:var(--muted)}.card small{color:var(--lime);font:11px "Courier New",monospace;letter-spacing:.12em;margin-top:auto}.runtime{padding:14px}.runtime iframe{display:block;width:100%;height:78vh;min-height:540px;max-height:980px;border:1px solid var(--line);border-radius:16px;background:var(--bg)}.status{padding:0 22px 16px;margin:0;color:var(--muted);font-size:12px;line-height:1.6}.status[data-error=true]{color:#ffacac}.host-note{font-size:11px;margin-left:8px;opacity:.7}@media(max-width:600px){.grid{grid-template-columns:1fr}.card{min-height:145px}.hostbar{padding:12px;gap:8px}.version{font-size:10px}.runtime{padding:8px}.hostbar select{max-width:46vw}.brand{font-size:14px}}
+</style>
 </head>
-<body><header class="hostbar" id="hostbar"><strong id="current-title">HTML 应用台</strong><div class="selector"><button id="selector-btn" type="button" aria-haspopup="listbox" aria-expanded="false">选择应用</button><ul id="menu" role="listbox" hidden></ul></div></header><main class="shell"><p class="kicker">HTML APP LOADER</p><h1>把不同网页<br>装进同一个插件</h1><p class="lead">预置应用由 MCP 按需返回。游戏离线可玩；行情页会读取公开接口，并明确显示数据来源和刷新时间。</p><nav class="grid" aria-label="预置应用" id="apps"></nav><div id="runtime" aria-live="polite"></div><p id="status" style="color:#93a7c2;font-size:12px;margin-top:18px">静态预览；在 Codex 内请使用顶栏选择器。</p></main><script>
-const title=document.getElementById('current-title'),btn=document.getElementById('selector-btn'),menu=document.getElementById('menu'),status=document.getElementById('status');
-const PRESET_APPS=[];
-let metadata=[],active=null,busy=false,request;
-
-function menuItems(){menu.replaceChildren();for(const app of metadata){const li=document.createElement('li');li.setAttribute('role','option');li.dataset.id=app.id;li.innerHTML=`<b>${app.title}</b><small>${app.description}</small>`;li.onclick=()=>{menu.hidden=true;btn.setAttribute('aria-expanded','false');select(app)};menu.append(li)}}
-function setActive(app){for(const li of menu.children)li.classList.toggle('active',li.dataset.id===app?.id);btn.textContent=app?app.title:'选择应用';title.textContent=app?app.title:'HTML 应用台'}
-async function select(app){if(busy||active?.id===app.id)return;busy=true;btn.disabled=true;setActive(app);status.textContent=`正在载入 ${app.title}…`;try{let html=app.html;if(!html){const response=await request('tools/call',{name:'runtime.load',arguments:{appId:app.id}});html=response?.structuredContent?.html}if(!html)throw new Error('没有预置 HTML');importHTML(html,app);active=app;setActive(app);status.textContent=`当前：${app.title} · 已载入独立运行时`}catch(error){console.warn(error);setActive(active);status.textContent=`载入失败：${error.message||error}`}finally{busy=false;btn.disabled=false}}
-function importHTML(html,app){const frame=document.createElement('iframe');frame.title=app.title;frame.srcdoc=html;frame.style='width:100%;min-height:min(72vh,680px);border:1px solid #283b5e;border-radius:20px;background:#080c16';document.getElementById('runtime').replaceChildren(frame);document.querySelector('main.shell').hidden=true}
-btn.onclick=()=>{menu.hidden=!menu.hidden;btn.setAttribute('aria-expanded',String(!menu.hidden))};
-document.addEventListener('click',event=>{if(!event.target.closest('.selector')){menu.hidden=true;btn.setAttribute('aria-expanded','false')}});
-function loadManifest(){metadata=PRESET_APPS;menuItems();const cards=document.getElementById('apps');cards.replaceChildren();for(const app of metadata){const card=document.createElement('button');card.type='button';card.className='card';card.innerHTML=`<span><span class="app-name">${app.title}</span><small>APP</small></span><span class="desc">${app.description}</span><span class="glyph" style="color:#012d1d">▶</span>`;card.onclick=()=>select(app);cards.append(card)}status.textContent='选择一个应用；游戏离线可玩，行情页需要公开接口。'}
-if(window.parent!==window){let id=0;const pending=new Map(),send=(method,params)=>parent.postMessage({jsonrpc:'2.0',method,params},'*');request=(method,params)=>new Promise((resolve,reject)=>{const messageId=++id,timer=setTimeout(()=>reject(new Error('bridge timeout')),10000);pending.set(messageId,{resolve,reject,timer});send(method,params)});addEventListener('message',event=>{if(event.source!==parent||event.data?.jsonrpc!=='2.0')return;const data=event.data;if(data.id!=null&&!data.method){const item=pending.get(data.id);if(item){clearTimeout(item.timer);pending.delete(data.id);data.error?item.reject(data.error):item.resolve(data.result)}}});request('ui/initialize',{appInfo:{name:'local-html-apps',version:'1.3.0'},appCapabilities:{},protocolVersion:'2026-01-26'}).then(()=>{send('ui/notifications/initialized',{});const resize=()=>send('ui/notifications/size-changed',{height:Math.max(520,Math.ceil(document.body.getBoundingClientRect().height)+10)});resize();new ResizeObserver(resize).observe(document.body)}).catch(error=>console.warn(error.message))}else{request=async()=>({structuredContent:{}});status.textContent='静态预览：浏览器内没有 MCP 桥，无法载入应用。'}
-loadManifest();
-</script></body>
+<body>
+<header class="hostbar">
+<button type="button" class="brand" id="home" aria-label="返回应用列表">HTML 应用台</button>
+<span class="version" id="version"></span>
+<select id="app-select" aria-label="选择应用"><option value="">选择应用</option></select>
+<button type="button" id="reload" hidden>重新载入</button>
+<button type="button" id="import">打开 HTML</button>
+<input type="file" id="html-file" accept=".html,.htm,text/html" hidden>
+</header>
+<main class="shell" id="catalog">
+<p class="kicker">YOUR SMALL APP SHELF</p>
+<h1>一个入口，<br>几个随手用的小应用。</h1>
+<p class="lead">选个游戏歇一会儿，或看看市场行情。也可以打开本地 HTML，切换时自动释放上一个页面。</p>
+<nav class="grid" aria-label="预置应用" id="apps"></nav>
+<noscript>需要启用 JavaScript 才能载入应用。</noscript>
+</main>
+<section class="runtime" id="runtime" aria-label="当前应用" hidden></section>
+<p class="status" role="status"><span id="status">正在准备应用列表…</span><span class="host-note" id="host-note"></span></p>
+<script id="app-data" type="application/json">{}</script>
+<script>
+(() => {
+  'use strict';
+  const bundle = JSON.parse(document.getElementById('app-data').textContent);
+  const apps = bundle.apps || [];
+  const catalog = document.getElementById('catalog');
+  const runtime = document.getElementById('runtime');
+  const selector = document.getElementById('app-select');
+  const status = document.getElementById('status');
+  const reload = document.getElementById('reload');
+  const fileInput = document.getElementById('html-file');
+  let active = null, imported = null;
+  function report(message, error = false) {
+    status.textContent = message;
+    status.parentElement.dataset.error = String(error);
+  }
+  function showCatalog() {
+    runtime.replaceChildren();
+    runtime.hidden = true;
+    catalog.hidden = false;
+    reload.hidden = true;
+    active = null;
+    selector.value = '';
+    report(`已预置 ${apps.length} 个应用；也可打开本地 HTML 文件。`);
+  }
+  function select(app) {
+    if (!app || typeof app.html !== 'string' || !app.html.trim()) {
+      report('载入失败：这个应用没有 HTML 内容。', true);
+      return;
+    }
+    const frame = document.createElement('iframe');
+    frame.title = app.title;
+    // Packaged pages may keep local scores. Imported HTML has an opaque origin.
+    frame.setAttribute('sandbox', app.imported ? 'allow-scripts' : 'allow-scripts allow-same-origin');
+    frame.setAttribute('referrerpolicy', 'no-referrer');
+    frame.addEventListener('load', () => {
+      if (runtime.firstElementChild === frame) report(`当前：${app.title}${app.imported ? ' · 本地导入，未保存文件' : ''}`);
+    }, {once: true});
+    frame.srcdoc = app.html;
+    runtime.replaceChildren(frame);
+    // Keep the runtime outside the catalog that is hidden on selection.
+    catalog.hidden = true;
+    runtime.hidden = false;
+    reload.hidden = false;
+    active = app;
+    selector.value = app.id;
+    report(`正在载入 ${app.title}…`);
+  }
+  document.getElementById('version').textContent = `v${bundle.version || 'preview'}`;
+  for (const app of apps) {
+    const option = document.createElement('option');
+    option.value = app.id;
+    option.textContent = app.title;
+    selector.append(option);
+    const card = document.createElement('button');
+    card.type = 'button'; card.className = 'card';
+    const name = document.createElement('b'); name.textContent = app.title;
+    const description = document.createElement('span'); description.textContent = app.description;
+    const action = document.createElement('small'); action.textContent = 'OPEN →';
+    card.append(name, description, action);
+    card.addEventListener('click', () => select(app));
+    document.getElementById('apps').append(card);
+  }
+  selector.addEventListener('change', () => {
+    const app = apps.find(item => item.id === selector.value) || (imported?.id === selector.value ? imported : null);
+    app ? select(app) : showCatalog();
+  });
+  document.getElementById('home').addEventListener('click', showCatalog);
+  reload.addEventListener('click', () => select(active));
+  document.getElementById('import').addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files[0]; if (!file) return;
+    try {
+      if (file.size > 8 * 1024 * 1024) throw new Error('请选择小于 8 MB 的自包含 HTML');
+      const html = await file.text();
+      if (!html.trim()) throw new Error('HTML 文件是空的');
+      const id = '__imported__';
+      selector.querySelector('option[value="__imported__"]')?.remove();
+      const option = document.createElement('option'); option.value = id; option.textContent = file.name;
+      selector.append(option);
+      imported = {id, title: file.name, html, imported: true};
+      select(imported);
+    } catch (error) { report(`打开失败：${error.message}`, true); }
+    finally { fileInput.value = ''; }
+  });
+  showCatalog();
+  // Only the shell talks to the MCP host. Plain HTML apps need no MCP code.
+  if (window.parent === window) return;
+  let rpcId = 0, lastHeight = 0, observer, disposed = false;
+  const pending = new Map();
+  const notify = (method, params) => parent.postMessage({jsonrpc: '2.0', method, params}, '*');
+  const request = (method, params) => new Promise((resolve, reject) => {
+    const id = ++rpcId;
+    const timeout = setTimeout(() => { pending.delete(id); reject(new Error('宿主初始化超时')); }, 10000);
+    pending.set(id, {resolve, reject, timeout});
+    parent.postMessage({jsonrpc: '2.0', id, method, params}, '*');
+  });
+  addEventListener('message', event => {
+    if (event.source !== parent || event.data?.jsonrpc !== '2.0') return;
+    const message = event.data;
+    if (message.id != null && !message.method) {
+      const entry = pending.get(message.id); if (!entry) return;
+      clearTimeout(entry.timeout); pending.delete(message.id);
+      message.error ? entry.reject(new Error(message.error.message)) : entry.resolve(message.result);
+    } else if (message.method === 'ui/resource-teardown') {
+      disposed = true;
+      observer?.disconnect(); runtime.replaceChildren();
+      for (const entry of pending.values()) { clearTimeout(entry.timeout); entry.reject(new Error('页面已关闭')); }
+      pending.clear();
+      parent.postMessage({jsonrpc: '2.0', id: message.id, result: {}}, '*');
+    }
+  });
+  request('ui/initialize', {
+    appInfo: {name: 'local-html-apps', version: bundle.version},
+    appCapabilities: {}, protocolVersion: '2026-01-26'
+  }).then(() => {
+    if (disposed) return;
+    notify('ui/notifications/initialized', {});
+    document.getElementById('host-note').textContent = '已连接 Codex';
+    observer = new ResizeObserver(() => {
+      const height = Math.max(540, Math.ceil(document.documentElement.getBoundingClientRect().height));
+      if (height !== lastHeight) { lastHeight = height; notify('ui/notifications/size-changed', {height}); }
+    });
+    observer.observe(document.body);
+  }).catch(error => { if (!disposed) document.getElementById('host-note').textContent = `${error.message}；本地应用仍可使用。`; });
+})();
+</script>
+</body>
 </html>

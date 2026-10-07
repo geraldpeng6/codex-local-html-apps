@@ -19,13 +19,12 @@
     {
       "id": "stocks",
       "title": "股票行情",
-      "description": "美股、港股、A股和指数，支持名称搜索与走势缩略图。",
+      "description": "美股、港股、A股和指数，支持常见名称、代码和走势缩略图。",
       "file": "stocks.html",
       "order": 3,
       "connectDomains": [
         "https://qt.gtimg.cn",
-        "https://web.ifzq.gtimg.cn",
-        "https://smartbox.gtimg.cn"
+        "https://web.ifzq.gtimg.cn"
       ]
     },
     {
@@ -37,14 +36,6 @@
       "connectDomains": [
         "https://api.binance.com"
       ]
-    },
-    {
-      "id": "loader-preview",
-      "title": "旧入口预览",
-      "description": "旧版卡片入口，仅作为静态预览保留。",
-      "file": "loader.html",
-      "order": 99,
-      "connectDomains": []
     }
   ]
 }
